@@ -1,6 +1,6 @@
 {
-  "name": "tollbrothers-ui-library",
-  "version": "0.1.0",
+  "name": "tb-svg-processor",
+  "version": "0.0.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -12,13 +12,10 @@
     "@geist-ui/core": "^2.3.8",
     "@geist-ui/icons": "^1.0.2",
     "@next/font": "13.0.7",
-    "@tollbrothers/tollbrothers-ui": "1.19.5",
-    "blaze-slider": "^1.9.0",
     "eslint": "8.30.0",
     "eslint-config-next": "13.0.7",
     "next": "13.0.7",
     "react": "18.2.0",
-    "react-blaze-slider": "^1.7.2",
     "react-dom": "18.2.0",
     "sass": "^1.57.1"
   }
