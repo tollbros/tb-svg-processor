@@ -2,9 +2,11 @@
   "name": "tb-svg-processor",
   "version": "0.0.1",
   "private": true,
+  "homepage": "https://tollbros.github.io/svg-processor",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
+    "export": "next export",
     "start": "next start",
     "lint": "next lint"
   },
