@@ -18,7 +18,7 @@ export default function Home () {
 
         reader.onload = (e) => {
 			svgContainer.current.innerHTML = '';
-          	const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); //Create a path in SVG's namespace
+          	const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           	newElement.innerHTML = e.target.result;
           	svgContainer.current.appendChild(newElement.children[0]);
         };
@@ -48,14 +48,14 @@ export default function Home () {
 	//DO YOUR STUFF VINCE
 	const process = () => {
 		setIsProcessing(true);
-		setTimeout(() => {
+		setTimeout(() => { //temp for demonstration
 			setIsProcessing(false);
 			setIsSvgSuccessfullyProcessed(true)
 		}, 3000);
 	}
 
 	return (
-		<Grid.Container height="100vh" direction="column" wrap='nowrap' gap={1}>
+		<Grid.Container direction="column" wrap='nowrap' gap={1}>
 			<Grid>
 				<Text h3 className={styles.heading}>Toll Brothers SVG Processor</Text>
 			</Grid>
