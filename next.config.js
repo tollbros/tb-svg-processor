@@ -6,7 +6,8 @@ let basePath = ''
 let output = 'standalone'
 
 if (isGithubActions) {
-  const repo = process.env.GITHUB_REPOSITORY.replace(/.*?\//, '')
+  //const repo = process.env.GITHUB_REPOSITORY.replace(/.*?\//, '')
+  const repo = 'tb-svg-processor';
 
   assetPrefix = `/${repo}/`
   basePath = `/${repo}`
