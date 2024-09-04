@@ -17,7 +17,6 @@ const svg_processor = async function() {
         const theLots = document.getElementById(theLotCollections[i].id).children;
         const collectionJDE = theLotCollections[i].id.replace(/LOTS-/, '');
     
-        //console.log('here');
         let coordinates;
 
         for (let l = 0; l < theLots.length; l++) {
@@ -34,18 +33,14 @@ const svg_processor = async function() {
           } else {
             console.error('NO KNOWN SHAPE?');
             console.log(currentLot);
-            //coordinates = getCoordinatesFromPolygon(currentLot);
             continue;
           }
 
           for (let g = 0; g < NumberCollection.length; g++) {
-            //const numberGroup = NumberCollection[g].children;
-            //const numberGroup = NumberCollection[g].querySelectorAll(':not([data-parsed="true"])');
             const numberGroup = Array.from(NumberCollection[g].children).filter(
               (child) => child.getAttribute('data-parsed') !== 'true'
             );
-    
-            //perhaps get the children that don't have data-parsed == true attribute
+
     
             for (let m = 0; m < numberGroup.length; m++) {
               let numberElement = numberGroup[m];
@@ -53,11 +48,7 @@ const svg_processor = async function() {
               if (numberElement.tagName == 'g') {
                 numberElement = numberElement.children[0];
               }
-    
-              /* // Skip if the element is a blue dot
-                if (numberElement.tagName === 'circle' && numberElement.classList.contains('ignore-dot')) {
-                    continue;
-                } */
+  
     
               const lotDigits = numberElement.textContent.trim();
               const collided = checkCollision(currentLot, numberElement, coordinates);
@@ -69,10 +60,6 @@ const svg_processor = async function() {
                 numberGroup[m].setAttribute('data-lot_num', parseInt(lotDigits));
                 numberGroup[m].setAttribute('data-parsed', true);
 
-                /**
-                 *
-                 * * SQFT LOOP
-                 */
 
                 if (sqftCollection) {
                   const sqftChildren = document.getElementById('SQUARE_FEET').children;
@@ -130,8 +117,6 @@ const svg_processor = async function() {
 
           }
         }
-
-        
 
     }
 

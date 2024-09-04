@@ -58,7 +58,7 @@ export default function Home () {
 		resetZoom();
 	}
 
-	//DO YOUR STUFF VINCE
+
 	const process = () => {
 		setIsProcessing(true);
 		const success = svg_processor();
