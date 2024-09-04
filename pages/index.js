@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from 'react'
 import { Grid, Text, Input, Button } from '@geist-ui/core'
+import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
@@ -75,8 +76,13 @@ export default function Home () {
 	}, [svgFile])
 
 	return (
+
+
 		<Grid.Container direction="column" wrap='nowrap' gap={1}>
 			<Grid>
+			<Head>
+				<title>Toll Brothers SVG Processor</title>
+			</Head>
 				<Text h3 className={styles.heading}>Toll Brothers SVG Processor</Text>
 			</Grid>
 			<Grid>
