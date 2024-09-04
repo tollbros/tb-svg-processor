@@ -2,21 +2,22 @@
 
 const isGithubActions = process.env.GITHUB_ACTIONS || false
 let basePath = ''
-let output = 'standalone'
+//let output = 'export'
 
 if (isGithubActions) {
   const repo = 'tb-svg-processor';
   basePath = `/${repo}`
-  output = 'export'
+  //output = 'export'
 }
 
 const nextConfig = {
   basePath: basePath,
-  output: output,
+  //output: output,
+  //output: "export",
+  reactStrictMode: true,
   images: {
     unoptimized: true,
   },
-  reactStrictMode: true
 }
 
 module.exports = nextConfig
