@@ -1,5 +1,7 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Grid, Text, Input, Button } from '@geist-ui/core'
+
+import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 import styles from './index.module.scss';
 
@@ -7,27 +9,36 @@ export default function Home () {
 	const [isSvgSuccessfullyProcessed, setIsSvgSuccessfullyProcessed] = useState(false);  //should be set to false, then set to true after processing success
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
-	const fileInput = useRef(null);
+	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 
-	const svgContainer = useRef(null);
+
+	const resetZoom = () => {
+		if (transformComponentRef.current) {
+			const { resetTransform } = transformComponentRef.current;
+			resetTransform();
+		}
+	}
 
 	const onFileInput = (event) => {
+		const svgWrapper = transformComponentRef.current.instance.contentComponent;
+
+		resetZoom();
 		setSvgFile(event.target.value);
         const file = event.target.files[0];
         const reader = new FileReader();
 
         reader.onload = (e) => {
-			svgContainer.current.innerHTML = '';
+			svgWrapper.innerHTML = '';
           	const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           	newElement.innerHTML = e.target.result;
-          	svgContainer.current.appendChild(newElement.children[0]);
+          	svgWrapper.appendChild(newElement.children[0]);
         };
 
         reader.readAsText(file);
 	}
 
 	const saveHTMLToFile = () => {
-		const fileContent = svgContainer.current.children[0].outerHTML;
+		const fileContent = transformComponentRef.current.instance.contentComponent.children[0].outerHTML;
 		const blob = new Blob([fileContent], { type: 'image/svg+xml' });
 		const url = URL.createObjectURL(blob);
 
@@ -39,10 +50,11 @@ export default function Home () {
 	}
 
 	const clear = () => {
-		svgContainer.current.innerHTML = '';
+		transformComponentRef.current.instance.contentComponent.innerHTML = '';
 		setSvgFile('');
 		setIsSvgSuccessfullyProcessed(false);
 		setIsProcessing(false);
+		resetZoom();
 	}
 
 	//DO YOUR STUFF VINCE
@@ -54,20 +66,31 @@ export default function Home () {
 		}, 3000);
 	}
 
+	useEffect(() => {
+		//setTimeout(() => resetZoom(), 2000);
+	}, [svgFile])
+
 	return (
 		<Grid.Container direction="column" wrap='nowrap' gap={1}>
 			<Grid>
 				<Text h3 className={styles.heading}>Toll Brothers SVG Processor</Text>
 			</Grid>
 			<Grid>
-				<Input ref={fileInput} label="Select a SVG" htmlType='file' onChange={onFileInput} width='100%' value={svgFile} />
+				<Input label="Select a SVG" htmlType='file' onChange={onFileInput} width='100%' value={svgFile} disabled={isProcessing}/>
 			</Grid>
-			<Grid>
-				<div className={styles.svgContainer} ref={svgContainer} ></div>
+			<Grid className={styles.svgContainer} >
+				<TransformWrapper
+				ref={transformComponentRef}
+				centerOnInit={true}
+				>
+				{() => (
+					<TransformComponent wrapperClass={styles.transformWrapper} contentClass={styles.transformWrapper}></TransformComponent>
+				)}
+				</TransformWrapper>				
 			</Grid>
 			<Grid.Container gap={1}>
 				<Grid>
-					<Button auto type="success" onClick={process} loading={isProcessing} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Process</Button>
+					<Button auto ghost type="success" onClick={process} loading={isProcessing} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Process</Button>
 				</Grid>
 				<Grid>
 					<Button auto type="success" onClick={saveHTMLToFile} disabled={!isSvgSuccessfullyProcessed || isProcessing}>Save</Button>
