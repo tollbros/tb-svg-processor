@@ -22,6 +22,10 @@ export default function Home () {
 	}
 
 	const onFileInput = (event) => {
+
+		console.log('onFileInput');
+		console.log(event.target.value);
+
 		const svgWrapper = transformComponentRef.current.instance.contentComponent;
 
 		resetZoom();
@@ -63,6 +67,7 @@ export default function Home () {
 	const process = () => {
 		setIsProcessing(true);
 		const success = svg_processor();
+		console.log("WAITING FOR THE LOOP");
 		if (success) {
 			setIsProcessing(false);
 			setIsSvgSuccessfullyProcessed(true);
