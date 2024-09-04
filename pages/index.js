@@ -3,7 +3,7 @@ import { Grid, Text, Input, Button } from '@geist-ui/core'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
-import SVGProcessor from '../utils/SVGProcessor';
+import svg_processor from '../utils/svg_processor';
 
 import styles from './index.module.scss';
 
@@ -19,8 +19,6 @@ export default function Home () {
 			resetTransform();
 		}
 	}
-
-	console.log("123123123123");
 
 	const onFileInput = (event) => {
 		const svgWrapper = transformComponentRef.current.instance.contentComponent;
@@ -62,12 +60,14 @@ export default function Home () {
 
 	//DO YOUR STUFF VINCE
 	const process = () => {
-		//setIsProcessing(true);
-		const success = SVGProcessor();
-		setTimeout(() => { //temp for demonstration
-			//setIsProcessing(false);
-			//setIsSvgSuccessfullyProcessed(true)
-		}, 3000);
+		setIsProcessing(true);
+		const success = svg_processor();
+		if (success) {
+			setIsProcessing(false);
+			setIsSvgSuccessfullyProcessed(true);
+		} else {
+			console.log("SOMETHING WENT WRONG");
+		}
 	}
 
 	useEffect(() => {
