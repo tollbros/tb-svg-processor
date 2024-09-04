@@ -2,18 +2,13 @@
 
 const isGithubActions = process.env.GITHUB_ACTIONS || false
 let basePath = ''
-//let output = 'export'
 
 if (isGithubActions) {
-  const repo = 'tb-svg-processor';
-  basePath = `/${repo}`
-  //output = 'export'
+  basePath = '/tb-svg-processor'
 }
 
 const nextConfig = {
   basePath: basePath,
-  //output: output,
-  //output: "export",
   reactStrictMode: true,
   images: {
     unoptimized: true,
