@@ -1,7 +1,10 @@
 import { useRef, useState, useEffect } from 'react'
 import { Grid, Text, Input, Button } from '@geist-ui/core'
+import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
+
+import svg_processor from '../utils/svg_processor';
 
 import styles from './index.module.scss';
 
@@ -9,8 +12,8 @@ export default function Home () {
 	const [isSvgSuccessfullyProcessed, setIsSvgSuccessfullyProcessed] = useState(false);  //should be set to false, then set to true after processing success
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
-	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 
+	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 
 	const resetZoom = () => {
 		if (transformComponentRef.current) {
@@ -20,6 +23,7 @@ export default function Home () {
 	}
 
 	const onFileInput = (event) => {
+
 		const svgWrapper = transformComponentRef.current.instance.contentComponent;
 
 		resetZoom();
@@ -59,22 +63,39 @@ export default function Home () {
 		resetZoom();
 	}
 
-	//DO YOUR STUFF VINCE
-	const process = () => {
-		setIsProcessing(true);
-		setTimeout(() => { //temp for demonstration
-			setIsProcessing(false);
-			setIsSvgSuccessfullyProcessed(true)
-		}, 3000);
-	}
 
+	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+	const process = async () => {
+		setIsProcessing(true);
+		try {
+			await delay(1000); // Delay for 1 second
+			const success = await svg_processor();
+			console.log("WAITING FOR THE LOOP");
+			if (success) {
+				setIsProcessing(false);
+				setIsSvgSuccessfullyProcessed(true);
+			} else {
+				console.log("SOMETHING WENT WRONG");
+			}
+		} catch (error) {
+			console.error("Error processing SVG:", error);
+			setIsProcessing(false);
+		}
+	}
+	
 	useEffect(() => {
 		//setTimeout(() => resetZoom(), 2000);
 	}, [svgFile])
 
 	return (
+
+
 		<Grid.Container direction="column" wrap='nowrap' gap={1}>
 			<Grid>
+			<Head>
+				<title>Toll Brothers SVG Processor</title>
+			</Head>
 				<Text h3 className={styles.heading}>Toll Brothers SVG Processor</Text>
 			</Grid>
 			<Grid>
