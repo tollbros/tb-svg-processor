@@ -23,6 +23,7 @@ export default function Home () {
 		const svgWrapper = transformComponentRef.current.instance.contentComponent;
 
 		resetZoom();
+		setIsSvgSuccessfullyProcessed(false);
 		setSvgFile(event.target.value);
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -38,13 +39,14 @@ export default function Home () {
 	}
 
 	const saveHTMLToFile = () => {
+		const fileName = /([^\\]+)\\?$/.exec(svgFile)?.[1]?.replace('.svg', '-processed.svg') || 'processed.svg';
 		const fileContent = transformComponentRef.current.instance.contentComponent.children[0].outerHTML;
 		const blob = new Blob([fileContent], { type: 'image/svg+xml' });
 		const url = URL.createObjectURL(blob);
 
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = 'processed.svg';
+		link.download = fileName;
 		link.click();
 		URL.revokeObjectURL(url);
 	}
@@ -76,7 +78,7 @@ export default function Home () {
 				<Text h3 className={styles.heading}>Toll Brothers SVG Processor</Text>
 			</Grid>
 			<Grid>
-				<Input label="Select a SVG" htmlType='file' onChange={onFileInput} width='100%' value={svgFile} disabled={isProcessing}/>
+				<Input label="Select a SVG" htmlType='file' onChange={onFileInput} width='100%' value={svgFile} disabled={isProcessing} accept=".svg"/>
 			</Grid>
 			<Grid className={styles.svgContainer} >
 				<TransformWrapper
