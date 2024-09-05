@@ -12,6 +12,7 @@ export default function Home () {
 	const [isSvgSuccessfullyProcessed, setIsSvgSuccessfullyProcessed] = useState(false);  //should be set to false, then set to true after processing success
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
+	const [fileName, setFileName] = useState('processed-file');
 	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 
 	const resetZoom = () => {
@@ -23,8 +24,13 @@ export default function Home () {
 
 	const onFileInput = (event) => {
 
-		console.log('onFileInput');
-		console.log(event.target.value);
+		const fullPath = event.target.value;
+		const startIndex = (fullPath.indexOf('\\') >= 0 ? fullPath.lastIndexOf('\\') : fullPath.lastIndexOf('/'));
+		let filename = fullPath.substring(startIndex);
+		if (filename.indexOf('\\') === 0 || filename.indexOf('/') === 0) {
+			filename = filename.substring(1);
+			setFileName(filename);
+		}
 
 		const svgWrapper = transformComponentRef.current.instance.contentComponent;
 
@@ -50,7 +56,9 @@ export default function Home () {
 
 		const link = document.createElement('a');
 		link.href = url;
-		link.download = 'processed.svg';
+
+		const processedFileName = fileName.replace('.svg', '-processed.svg');
+		link.download = processedFileName; //'processed.svg';
 		link.click();
 		URL.revokeObjectURL(url);
 	}
@@ -64,18 +72,26 @@ export default function Home () {
 	}
 
 
-	const process = () => {
+	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+	const process = async () => {
 		setIsProcessing(true);
-		const success = svg_processor();
-		console.log("WAITING FOR THE LOOP");
-		if (success) {
+		try {
+			await delay(1000); // Delay for 1 second
+			const success = await svg_processor();
+			console.log("WAITING FOR THE LOOP");
+			if (success) {
+				setIsProcessing(false);
+				setIsSvgSuccessfullyProcessed(true);
+			} else {
+				console.log("SOMETHING WENT WRONG");
+			}
+		} catch (error) {
+			console.error("Error processing SVG:", error);
 			setIsProcessing(false);
-			setIsSvgSuccessfullyProcessed(true);
-		} else {
-			console.log("SOMETHING WENT WRONG");
 		}
 	}
-
+	
 	useEffect(() => {
 		//setTimeout(() => resetZoom(), 2000);
 	}, [svgFile])
