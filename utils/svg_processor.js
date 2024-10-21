@@ -46,11 +46,19 @@ const svg_processor = async function() {
               let numberElement = numberGroup[m];
     
               if (numberElement.tagName == 'g') {
-                numberElement = numberElement.children[0];
+
+                if (numberElement.children[0].tagName == 'g') {
+                  console.log("numberElement group in a group fix attempt");
+                  numberElement = numberElement.children[0].children[0];
+                } else {
+                  numberElement = numberElement.children[0];
+                }
+              
               }
   
     
               const lotDigits = numberElement.textContent.trim();
+
               const collided = checkCollision(currentLot, numberElement, coordinates);
     
               if (collided) {
