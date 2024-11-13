@@ -33,6 +33,7 @@ export default function Home () {
 
 		resetZoom();
 		setIsSvgSuccessfullyProcessed(false);
+		setIsDesert(false);
 		setSvgFile(event.target.value);
         const file = event.target.files[0];
         const reader = new FileReader();
@@ -64,6 +65,7 @@ export default function Home () {
 		transformComponentRef.current.instance.contentComponent.innerHTML = '';
 		setSvgFile('');
 		setIsSvgSuccessfullyProcessed(false);
+		setIsDesert(false);
 		setIsProcessing(false);
 		resetZoom();
 	}
