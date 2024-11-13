@@ -1,5 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
-import { Grid, Text, Input, Button } from '@geist-ui/core'
+import { Grid, Text, Input, Button, Checkbox } from '@geist-ui/core'
 import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
@@ -12,8 +12,13 @@ export default function Home () {
 	const [isSvgSuccessfullyProcessed, setIsSvgSuccessfullyProcessed] = useState(false);  //should be set to false, then set to true after processing success
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
+	const [isDesert, setIsDesert] = useState(false);
 
 	const transformComponentRef = useRef(ReactZoomPanPinchRef);
+	
+	const toggleDesert = () => {
+		setIsDesert(!isDesert);
+	}
 
 	const resetZoom = () => {
 		if (transformComponentRef.current) {
@@ -68,9 +73,10 @@ export default function Home () {
 
 	const process = async () => {
 		setIsProcessing(true);
+
 		try {
 			await delay(1000); // Delay for 1 second
-			const success = await svg_processor();
+			const success = await svg_processor(isDesert);
 			console.log("WAITING FOR THE LOOP");
 			if (success) {
 				setIsProcessing(false);
@@ -120,6 +126,9 @@ export default function Home () {
 				</Grid>
 				<Grid>
 					<Button ghost auto type="secondary" onClick={clear} disabled={svgFile === '' || isProcessing}>Clear</Button>
+				</Grid>
+				<Grid className={styles.checkboxy}>
+					<Checkbox checked={isDesert} onChange={toggleDesert} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Set Terrain To Desert</Checkbox>
 				</Grid>
 			</Grid.Container>
 		</Grid.Container>

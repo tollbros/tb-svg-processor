@@ -3,7 +3,7 @@ import getCoordinatesFromPolygon from './getCoordinatesFromPolygon';
 import getCoordinatesFromRect from './getCoordinatesFromRect';
 import checkCollision from './checkCollision';
 
-const svg_processor = async function() {
+const svg_processor = async function(isDesert) {
 
     console.log("starting SVG Processor");
     const theSVG = document.querySelector('svg');
@@ -11,6 +11,11 @@ const svg_processor = async function() {
     const NumberCollection = document.getElementById('LOT_NUMBERS').children;
     const sqftCollection = document.getElementById('SQUARE_FEET');
     const lotDimensions = document.getElementById('LOT_DIMS');
+
+    if (isDesert) {
+      theSVG.setAttribute('data-terrain', "desert");
+    }
+
 
 
     for (let i = 0; i < theLotCollections.length; i++) {
