@@ -92,7 +92,9 @@ const svg_processor = async function(isDesert) {
                       if (sqft_collided) {
                         collectionSQFTChildren[ft].setAttribute('data-jde_num', collectionJDE);
                         collectionSQFTChildren[ft].setAttribute('data-lot_num', parseInt(lotDigits));
-                        break;
+                        //Removed to catch when number and "sq ft" are individual elements
+                        // - Vince 01.24.2025
+                        //break;
                       }
                     }
                   }
