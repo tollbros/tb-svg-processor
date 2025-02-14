@@ -3,6 +3,20 @@ import getCoordinatesFromPolygon from './getCoordinatesFromPolygon';
 import getCoordinatesFromRect from './getCoordinatesFromRect';
 import checkCollision from './checkCollision';
 
+
+
+const getYoungestGroup = (element) => {
+  let newElement = element;
+
+  if (newElement.tagName == 'g') {
+    while (newElement.tagName == 'g' && newElement.children.length > 0) {
+      newElement = newElement.children[0];
+    }
+  }
+  return newElement;
+}
+
+
 const svg_processor = async function(isDesert) {
 
     console.log("starting SVG Processor");
@@ -10,13 +24,18 @@ const svg_processor = async function(isDesert) {
     const theLotCollections = document.getElementById('LOTS').children;
     const NumberCollection = document.getElementById('LOT_NUMBERS').children;
     const sqftCollection = document.getElementById('SQUARE_FEET');
-    const lotDimensions = document.getElementById('LOT_DIMS');
+    const lotDimensions = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
+
+
+    console.log(lotDimensions);
 
     if (isDesert) {
       theSVG.setAttribute('data-terrain', "desert");
     }
 
 
+    console.log("SVG Processing: Starting...");
+    console.log(sqftCollection);
 
     for (let i = 0; i < theLotCollections.length; i++) {
         const theLots = document.getElementById(theLotCollections[i].id).children;
@@ -49,21 +68,8 @@ const svg_processor = async function(isDesert) {
     
             for (let m = 0; m < numberGroup.length; m++) {
               let numberElement = numberGroup[m];
-    
-              if (numberElement.tagName == 'g') {
-
-                if (numberElement.children[0].tagName == 'g') {
-                  console.log("numberElement group in a group fix attempt");
-                  numberElement = numberElement.children[0].children[0];
-                } else {
-                  numberElement = numberElement.children[0];
-                }
-              
-              }
-  
-    
+              numberElement = getYoungestGroup(numberElement);    
               const lotDigits = numberElement.textContent.trim();
-
               const collided = checkCollision(currentLot, numberElement, coordinates);
     
               if (collided) {
@@ -82,11 +88,7 @@ const svg_processor = async function(isDesert) {
 
                     for (let ft = 0; ft < collectionSQFTChildren.length; ft++) {
                       let currentSQFT = collectionSQFTChildren[ft];
-
-                      if (currentSQFT.tagName == 'g') {
-                        currentSQFT = currentSQFT.children[0];
-                      }
-
+                      currentSQFT = getYoungestGroup(currentSQFT);
                       const sqft_collided = checkCollision(currentLot, currentSQFT, coordinates);
 
                       if (sqft_collided) {
@@ -107,17 +109,19 @@ const svg_processor = async function(isDesert) {
                     const lotDim = lotDimChildren[i].children;
 
                     for (let c = 0; c < lotDim.length; c++) {
-                      let currentDIM = lotDim[c];
+                      if (!lotDim[c].hasAttribute('data-jde_num')) {
+                        let currentDIM = lotDim[c];
 
-                      if (currentDIM.tagName == 'g') {
-                        currentDIM = lotDim[c].children[0];
-                      }
+                        if (currentDIM.tagName == 'g') {
+                          currentDIM = lotDim[c].children[0];
+                        }
 
-                      const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
+                        const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
 
-                      if (dim_collided) {
-                        lotDim[c].setAttribute('data-jde_num', collectionJDE);
-                        lotDim[c].setAttribute('data-lot_num', parseInt(lotDigits));
+                        if (dim_collided) {
+                          lotDim[c].setAttribute('data-jde_num', collectionJDE);
+                          lotDim[c].setAttribute('data-lot_num', parseInt(lotDigits));
+                        }
                       }
                     }
                   }
