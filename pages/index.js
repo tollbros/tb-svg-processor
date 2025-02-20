@@ -4,7 +4,6 @@ import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
-import svg_processor from '../utils/svg_processor';
 import svg_lot_processor from '../utils/svg_lot_processor';
 
 import styles from './index.module.scss';
@@ -19,10 +18,6 @@ export default function Home () {
 	const NumberCollection  = useRef(null);
 	const sqftCollection  = useRef(null);
 	const lotDimensions  = useRef(null);
-  
-	/* const [collectionCount, setCollectionCount] = useState(-1);
-	const [lotCount, setLotCount] = useState(-1); */
-
 	const lotCountRef = useRef(0);
     const collectionCountRef = useRef(0);
 
@@ -132,7 +127,6 @@ export default function Home () {
 
 	const process = async () => {
 		setIsProcessing(true);
-		//setCollectionCount(0);
 	}
 	
 	useEffect(() => {
@@ -176,7 +170,7 @@ export default function Home () {
 					<Checkbox checked={isDesert} onChange={toggleDesert} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Set Terrain To Desert</Checkbox>
 				</Grid>
 				<Grid className={styles.counter}>
-					Collection: {collectionCountRef.current} | Lot: {lotCountRef.current}
+					Set Zoom Level
 				</Grid>
 			</Grid.Container>
 		</Grid.Container>

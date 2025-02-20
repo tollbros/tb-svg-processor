@@ -40,13 +40,10 @@ const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqf
   }
 
   for (let g = 0; g < NumberCollection.length; g++) {
-    const numberGroup = Array.from(NumberCollection[g].children).filter(
-      (child) => child.getAttribute('data-parsed') !== 'true'
-    );
 
-
-    for (let m = 0; m < numberGroup.length; m++) {
-      let numberElement = numberGroup[m];
+    const numberChildren = NumberCollection[g].querySelectorAll(':scope > *:not([data-jde_num])');
+    numberChildren.forEach((numberThing) => {
+      let numberElement = numberThing;
       numberElement = getYoungestGroup(numberElement);    
       const lotDigits = numberElement.textContent.trim();
       const collided = checkCollision(currentLot, numberElement, coordinates);
@@ -54,9 +51,8 @@ const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqf
       if (collided) {
         currentLot.setAttribute('data-jde_num', collectionJDE);
         currentLot.setAttribute('data-lot_num', parseInt(lotDigits));
-        numberGroup[m].setAttribute('data-jde_num', collectionJDE);
-        numberGroup[m].setAttribute('data-lot_num', parseInt(lotDigits));
-        numberGroup[m].setAttribute('data-parsed', true);
+        numberThing.setAttribute('data-jde_num', collectionJDE);
+        numberThing.setAttribute('data-lot_num', parseInt(lotDigits));
 
 
         if (sqftCollection) {
@@ -69,13 +65,14 @@ const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqf
       
               collectionSQFTChildren.forEach((currentSQFT) => {
                   // Ensure we're checking the correct element
-                  currentSQFT = getYoungestGroup(currentSQFT);
+                  const parentSQFT = currentSQFT;
+                  currentSQFT = getYoungestGroup(parentSQFT);
       
                   const sqft_collided = checkCollision(currentLot, currentSQFT, coordinates);
       
                   if (sqft_collided) {
-                      currentSQFT.setAttribute('data-jde_num', collectionJDE);
-                      currentSQFT.setAttribute('data-lot_num', parseInt(lotDigits));
+                    parentSQFT.setAttribute('data-jde_num', collectionJDE);
+                    parentSQFT.setAttribute('data-lot_num', parseInt(lotDigits));
                   }
               });
           });
@@ -84,31 +81,36 @@ const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqf
 
         if (lotDimensions) {
           // Select all children that do NOT have the 'data-jde_num' attribute
-          const lotDimChildren = lotDimensions.querySelectorAll(':scope > *:not([data-jde_num])');
+          const lotDimChildren = lotDimensions.children[0].querySelectorAll(':scope > *:not([data-jde_num])');
       
           lotDimChildren.forEach((lotDim) => {
-              let currentDIM = lotDim;
+            const parentLotDim = lotDim;
+              /* let currentDIM = lotDim;
       
               // If it's a group (`<g>`), use its first child
               if (currentDIM.tagName === 'g' && currentDIM.children.length > 0) {
                   currentDIM = currentDIM.children[0];
-              }
+              } */
+
+              const currentDIM = getYoungestGroup(parentLotDim);
       
+              console.log(currentDIM);
               const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
       
               if (dim_collided) {
-                  lotDim.setAttribute('data-jde_num', collectionJDE);
-                  lotDim.setAttribute('data-lot_num', parseInt(lotDigits));
+                console.log('DIM COLLIDED');
+                parentLotDim.setAttribute('data-jde_num', collectionJDE);
+                parentLotDim.setAttribute('data-lot_num', parseInt(lotDigits));
               }
           });
       }
 
-        break;
+        //break;
       } else {
         //console.log(`Lot ${currentLot.id}: Number ${lotDigits} is NOT inside the lot.`);
       }
 
-    }
+    });
 
   }
 
