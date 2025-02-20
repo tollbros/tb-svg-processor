@@ -22,3 +22,12 @@
     display: flex;
     align-items: center;
 }
+
+.counter {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 30px;
+    font-size: 10px !important;
+    color: gray;
+}

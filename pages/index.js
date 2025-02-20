@@ -193,7 +193,7 @@ export default function Home () {
 				<Grid className={styles.checkboxy}>
 					<Checkbox checked={isDesert} onChange={toggleDesert} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Set Terrain To Desert</Checkbox>
 				</Grid>
-				<Grid>
+				<Grid className={styles.counter}>
 					Collection: {collectionCount} | Lot: {lotCount}
 				</Grid>
 			</Grid.Container>
