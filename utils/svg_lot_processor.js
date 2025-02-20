@@ -16,7 +16,7 @@ const getYoungestGroup = (element) => {
   return newElement;
 }
 
-const svg_lot_processor = async function(isDesert, lot, jde_num, NumberCollection, sqftCollection, lotDimensions) {
+const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqftCollection, lotDimensions) {
   console.log("svg_lot_processor...");
   //const NumberCollection = document.getElementById('LOT_NUMBERS').children;
   //const sqftCollection = document.getElementById('SQUARE_FEET');
@@ -60,7 +60,7 @@ const svg_lot_processor = async function(isDesert, lot, jde_num, NumberCollectio
 
 
         if (sqftCollection) {
-          const sqftChildren = document.getElementById('SQUARE_FEET').children;
+          const sqftChildren = sqftCollection.children;
 
           for (let s = 0; s < sqftChildren.length; s++) {
             const collectionSQFTChildren = sqftChildren[s].children;
@@ -81,8 +81,8 @@ const svg_lot_processor = async function(isDesert, lot, jde_num, NumberCollectio
           }
         }
 
-        if (false) { //lotDimensions
-          const lotDimChildren = document.getElementById('LOT_DIMS').children;
+        if (lotDimensions) { //lotDimensions
+          const lotDimChildren = lotDimensions.children;
 
           for (let i = 0; i < lotDimChildren.length; i++) {
             const lotDim = lotDimChildren[i].children;

@@ -20,8 +20,11 @@ export default function Home () {
 	const sqftCollection  = useRef(null);
 	const lotDimensions  = useRef(null);
   
-	const [collectionCount, setCollectionCount] = useState(-1);
-	const [lotCount, setLotCount] = useState(-1);
+	/* const [collectionCount, setCollectionCount] = useState(-1);
+	const [lotCount, setLotCount] = useState(-1); */
+
+	const lotCountRef = useRef(0);
+    const collectionCountRef = useRef(0);
 
 	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 	
@@ -86,71 +89,50 @@ export default function Home () {
 		resetZoom();
 	}
 
+	const processLots = () => {
+        if (!isProcessing) return; // Stop if processing is done
 
-	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const lotCount = lotCountRef.current;
+        const collectionCount = collectionCountRef.current;
+        const theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
+		const jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
 
-
-	
-	const checkLot = async () => {
-		console.log("checkLot");
-		const theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
-		const nextLot = lotCount + 1;
-		//console.log(theLots[lotCount]);
-		//theLotCollections.current[collectionCount].id.replace(/LOTS-/, '')
-		const success = await svg_lot_processor(isDesert, theLots[lotCount], "1234", NumberCollection.current, sqftCollection.current, lotDimensions.current);
-
-		
-		//theLots[lotCount].setAttribute('stroke', 'red');
-		theLots[lotCount].style.filter = 'brightness(0)';
-		if (nextLot < theLots.length) {
-			setLotCount((prev) => prev + 1);
-		} else {
-			const nextCollection = collectionCount + 1;
-			if (nextCollection < theLotCollections.current.length) {
-				setCollectionCount((prev) => prev + 1);
-			} else {
-				setIsSvgSuccessfullyProcessed(true);
-				setIsProcessing(false);
+        if (lotCount < theLots.length) {
+			const success = svg_lot_processor(isDesert, theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
+            if (success) {
+				theLots[lotCount].style.filter = "brightness(0)";
+				lotCountRef.current++;
+				requestAnimationFrame(processLots); // Process the next lot
 			}
-		}
-	}
-
-
+        } else {
+            lotCountRef.current = 0;
+            const nextCollection = collectionCount + 1;
+            if (nextCollection < theLotCollections.current.length) {
+                collectionCountRef.current = nextCollection;
+                requestAnimationFrame(processLots); // Move to the next collection
+            } else {
+				document.querySelectorAll('[style*="brightness(0)"]').forEach((el) => {
+					el.style.filter = "";
+				});
+                setIsSvgSuccessfullyProcessed(true);
+                setIsProcessing(false);
+            }
+        }
+    };
 
 	useEffect(() => {
-		if (collectionCount > -1) {
-			setLotCount(0);
-		}
-	}, [collectionCount])
+        if (isProcessing) {
+            lotCountRef.current = 0;
+            collectionCountRef.current = 0;
+            requestAnimationFrame(processLots);
+        }
+    }, [isProcessing]);
 
-	useEffect(() => {
-		if (lotCount > -1) {
-			checkLot();
-		}
-	}, [lotCount])
 
 
 	const process = async () => {
-
 		setIsProcessing(true);
-		setCollectionCount(0);
-
-		/* setIsProcessing(true);
-
-		try {
-			await delay(1000); // Delay for 1 second
-			const success = await svg_processor(isDesert);
-			console.log("WAITING FOR THE LOOP");
-			if (success) {
-				setIsProcessing(false);
-				setIsSvgSuccessfullyProcessed(true);
-			} else {
-				console.log("SOMETHING WENT WRONG");
-			}
-		} catch (error) {
-			console.error("Error processing SVG:", error);
-			setIsProcessing(false);
-		} */
+		//setCollectionCount(0);
 	}
 	
 	useEffect(() => {
@@ -194,7 +176,7 @@ export default function Home () {
 					<Checkbox checked={isDesert} onChange={toggleDesert} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Set Terrain To Desert</Checkbox>
 				</Grid>
 				<Grid className={styles.counter}>
-					Collection: {collectionCount} | Lot: {lotCount}
+					Collection: {collectionCountRef.current} | Lot: {lotCountRef.current}
 				</Grid>
 			</Grid.Container>
 		</Grid.Container>
