@@ -60,51 +60,48 @@ const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqf
 
 
         if (sqftCollection) {
-          const sqftChildren = sqftCollection.children;
-
-          for (let s = 0; s < sqftChildren.length; s++) {
-            const collectionSQFTChildren = sqftChildren[s].children;
-
-            for (let ft = 0; ft < collectionSQFTChildren.length; ft++) {
-              let currentSQFT = collectionSQFTChildren[ft];
-              currentSQFT = getYoungestGroup(currentSQFT);
-              const sqft_collided = checkCollision(currentLot, currentSQFT, coordinates);
-
-              if (sqft_collided) {
-                collectionSQFTChildren[ft].setAttribute('data-jde_num', collectionJDE);
-                collectionSQFTChildren[ft].setAttribute('data-lot_num', parseInt(lotDigits));
-                //Removed to catch when number and "sq ft" are individual elements
-                // - Vince 01.24.2025
-                //break;
-              }
-            }
-          }
+          // Select all elements inside sqftCollection that do NOT have 'data-jde_num'
+          const sqftChildren = sqftCollection.querySelectorAll(':scope > *:not([data-jde_num])');
+      
+          sqftChildren.forEach((sqftChild) => {
+              // Select all children within this element that do NOT have 'data-jde_num'
+              const collectionSQFTChildren = sqftChild.querySelectorAll(':scope > *:not([data-jde_num])');
+      
+              collectionSQFTChildren.forEach((currentSQFT) => {
+                  // Ensure we're checking the correct element
+                  currentSQFT = getYoungestGroup(currentSQFT);
+      
+                  const sqft_collided = checkCollision(currentLot, currentSQFT, coordinates);
+      
+                  if (sqft_collided) {
+                      currentSQFT.setAttribute('data-jde_num', collectionJDE);
+                      currentSQFT.setAttribute('data-lot_num', parseInt(lotDigits));
+                  }
+              });
+          });
         }
+      
 
-        if (lotDimensions) { //lotDimensions
-          const lotDimChildren = lotDimensions.children;
-
-          for (let i = 0; i < lotDimChildren.length; i++) {
-            const lotDim = lotDimChildren[i].children;
-
-            for (let c = 0; c < lotDim.length; c++) {
-              if (!lotDim[c].hasAttribute('data-jde_num')) {
-                let currentDIM = lotDim[c];
-
-                if (currentDIM.tagName == 'g') {
-                  currentDIM = lotDim[c].children[0];
-                }
-
-                const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
-
-                if (dim_collided) {
-                  lotDim[c].setAttribute('data-jde_num', collectionJDE);
-                  lotDim[c].setAttribute('data-lot_num', parseInt(lotDigits));
-                }
+        if (lotDimensions) {
+          // Select all children that do NOT have the 'data-jde_num' attribute
+          const lotDimChildren = lotDimensions.querySelectorAll(':scope > *:not([data-jde_num])');
+      
+          lotDimChildren.forEach((lotDim) => {
+              let currentDIM = lotDim;
+      
+              // If it's a group (`<g>`), use its first child
+              if (currentDIM.tagName === 'g' && currentDIM.children.length > 0) {
+                  currentDIM = currentDIM.children[0];
               }
-            }
-          }
-        }
+      
+              const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
+      
+              if (dim_collided) {
+                  lotDim.setAttribute('data-jde_num', collectionJDE);
+                  lotDim.setAttribute('data-lot_num', parseInt(lotDigits));
+              }
+          });
+      }
 
         break;
       } else {
