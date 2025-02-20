@@ -1,10 +1,11 @@
-import { useRef, useState, useEffect } from 'react'
+import { useRef, useState, useEffect, use } from 'react'
 import { Grid, Text, Input, Button, Checkbox } from '@geist-ui/core'
 import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 import svg_processor from '../utils/svg_processor';
+import svg_lot_processor from '../utils/svg_lot_processor';
 
 import styles from './index.module.scss';
 
@@ -13,6 +14,14 @@ export default function Home () {
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
 	const [isDesert, setIsDesert] = useState(false);
+
+	const theLotCollections = useRef(null);
+	const NumberCollection  = useRef(null);
+	const sqftCollection  = useRef(null);
+	const lotDimensions  = useRef(null);
+  
+	const [collectionCount, setCollectionCount] = useState(-1);
+	const [lotCount, setLotCount] = useState(-1);
 
 	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 	
@@ -43,6 +52,13 @@ export default function Home () {
           	const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           	newElement.innerHTML = e.target.result;
           	svgWrapper.appendChild(newElement.children[0]);
+
+			console.log("LOADED");
+			theLotCollections.current = document.getElementById('LOTS').children;
+			NumberCollection.current = document.getElementById('LOT_NUMBERS').children;
+			sqftCollection.current = document.getElementById('SQUARE_FEET');
+			lotDimensions.current = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
+		  
         };
 
         reader.readAsText(file);
@@ -73,8 +89,53 @@ export default function Home () {
 
 	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
+
+	
+	const checkLot = async () => {
+		console.log("checkLot");
+		const theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
+		const nextLot = lotCount + 1;
+		//console.log(theLots[lotCount]);
+		//theLotCollections.current[collectionCount].id.replace(/LOTS-/, '')
+		const success = await svg_lot_processor(isDesert, theLots[lotCount], "1234", NumberCollection.current, sqftCollection.current, lotDimensions.current);
+
+		
+		//theLots[lotCount].setAttribute('stroke', 'red');
+		theLots[lotCount].style.filter = 'brightness(0)';
+		if (nextLot < theLots.length) {
+			setLotCount((prev) => prev + 1);
+		} else {
+			const nextCollection = collectionCount + 1;
+			if (nextCollection < theLotCollections.current.length) {
+				setCollectionCount((prev) => prev + 1);
+			} else {
+				setIsSvgSuccessfullyProcessed(true);
+				setIsProcessing(false);
+			}
+		}
+	}
+
+
+
+	useEffect(() => {
+		if (collectionCount > -1) {
+			setLotCount(0);
+		}
+	}, [collectionCount])
+
+	useEffect(() => {
+		if (lotCount > -1) {
+			checkLot();
+		}
+	}, [lotCount])
+
+
 	const process = async () => {
+
 		setIsProcessing(true);
+		setCollectionCount(0);
+
+		/* setIsProcessing(true);
 
 		try {
 			await delay(1000); // Delay for 1 second
@@ -89,7 +150,7 @@ export default function Home () {
 		} catch (error) {
 			console.error("Error processing SVG:", error);
 			setIsProcessing(false);
-		}
+		} */
 	}
 	
 	useEffect(() => {
@@ -131,6 +192,9 @@ export default function Home () {
 				</Grid>
 				<Grid className={styles.checkboxy}>
 					<Checkbox checked={isDesert} onChange={toggleDesert} disabled={svgFile === '' || isProcessing || isSvgSuccessfullyProcessed}>Set Terrain To Desert</Checkbox>
+				</Grid>
+				<Grid>
+					Collection: {collectionCount} | Lot: {lotCount}
 				</Grid>
 			</Grid.Container>
 		</Grid.Container>
