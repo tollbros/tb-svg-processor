@@ -16,7 +16,7 @@ const getYoungestGroup = (element) => {
   return newElement;
 }
 
-const svg_lot_processor = function(isDesert, lot, jde_num, NumberCollection, sqftCollection, lotDimensions) {
+const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollection, lotDimensions) {
   console.log("svg_lot_processor...");
   //const NumberCollection = document.getElementById('LOT_NUMBERS').children;
   //const sqftCollection = document.getElementById('SQUARE_FEET');

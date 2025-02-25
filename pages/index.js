@@ -92,7 +92,7 @@ export default function Home () {
 		const jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
 
         if (lotCount < theLots.length) {
-			const success = svg_lot_processor(isDesert, theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
+			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
             if (success) {
 				theLots[lotCount].style.filter = "brightness(0)";
 				lotCountRef.current++;
@@ -118,6 +118,10 @@ export default function Home () {
 
 	const process = async () => {
 		setIsProcessing(true);
+		if (isDesert) {
+			const theSVG = document.querySelector('svg');
+			theSVG.setAttribute('data-terrain', "desert");
+		}
 		lotCountRef.current = 0;
 		collectionCountRef.current = 0;
 		requestAnimationFrame(processLots);
