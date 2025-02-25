@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect, use } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { Grid, Text, Input, Button, Checkbox } from '@geist-ui/core'
 import Head from 'next/head'
 
