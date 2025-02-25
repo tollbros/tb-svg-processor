@@ -4,7 +4,7 @@ import Head from 'next/head'
 
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
-import svg_processor from '../utils/svg_processor';
+import svg_lot_processor from '../utils/svg_lot_processor';
 
 import styles from './index.module.scss';
 
@@ -13,6 +13,13 @@ export default function Home () {
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
 	const [isDesert, setIsDesert] = useState(false);
+
+	const theLotCollections = useRef(null);
+	const NumberCollection  = useRef(null);
+	const sqftCollection  = useRef(null);
+	const lotDimensions  = useRef(null);
+	const lotCountRef = useRef(0);
+    const collectionCountRef = useRef(0);
 
 	const transformComponentRef = useRef(ReactZoomPanPinchRef);
 	
@@ -43,6 +50,13 @@ export default function Home () {
           	const newElement = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
           	newElement.innerHTML = e.target.result;
           	svgWrapper.appendChild(newElement.children[0]);
+
+			console.log("LOADED");
+			theLotCollections.current = document.getElementById('LOTS').children;
+			NumberCollection.current = document.getElementById('LOT_NUMBERS').children;
+			sqftCollection.current = document.getElementById('SQUARE_FEET');
+			lotDimensions.current = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
+		  
         };
 
         reader.readAsText(file);
@@ -70,26 +84,47 @@ export default function Home () {
 		resetZoom();
 	}
 
+	const processLots = () => {
 
-	const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+        const lotCount = lotCountRef.current;
+        const collectionCount = collectionCountRef.current;
+        const theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
+		const jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
+
+        if (lotCount < theLots.length) {
+			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
+            if (success) {
+				theLots[lotCount].style.filter = "brightness(0)";
+				lotCountRef.current++;
+				requestAnimationFrame(processLots); // Process the next lot
+			}
+        } else {
+            lotCountRef.current = 0;
+            const nextCollection = collectionCount + 1;
+            if (nextCollection < theLotCollections.current.length) {
+                collectionCountRef.current = nextCollection;
+                requestAnimationFrame(processLots); // Move to the next collection
+            } else {
+				document.querySelectorAll('[style*="brightness(0)"]').forEach((el) => {
+					el.style.filter = "";
+				});
+                setIsSvgSuccessfullyProcessed(true);
+                setIsProcessing(false);
+            }
+        }
+    };
+
+
 
 	const process = async () => {
 		setIsProcessing(true);
-
-		try {
-			await delay(1000); // Delay for 1 second
-			const success = await svg_processor(isDesert);
-			console.log("WAITING FOR THE LOOP");
-			if (success) {
-				setIsProcessing(false);
-				setIsSvgSuccessfullyProcessed(true);
-			} else {
-				console.log("SOMETHING WENT WRONG");
-			}
-		} catch (error) {
-			console.error("Error processing SVG:", error);
-			setIsProcessing(false);
+		if (isDesert) {
+			const theSVG = document.querySelector('svg');
+			theSVG.setAttribute('data-terrain', "desert");
 		}
+		lotCountRef.current = 0;
+		collectionCountRef.current = 0;
+		requestAnimationFrame(processLots);
 	}
 	
 	useEffect(() => {

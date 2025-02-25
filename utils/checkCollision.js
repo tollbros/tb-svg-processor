@@ -70,6 +70,7 @@ function checkCollision(lot, numberElement, coordinates, showDots = false) {
   let checked = false;
 
   if (lot.tagName == 'path') {
+    console.log('Checking path');
     const path1 = createPath2DFromElement(lot);
     const ctx = document.createElement('canvas').getContext('2d');
     checked = ctx.isPointInPath(path1, transformedCenter.x, transformedCenter.y);
