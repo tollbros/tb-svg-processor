@@ -85,7 +85,6 @@ export default function Home () {
 	}
 
 	const processLots = () => {
-        if (!isProcessing) return; // Stop if processing is done
 
         const lotCount = lotCountRef.current;
         const collectionCount = collectionCountRef.current;
@@ -115,18 +114,13 @@ export default function Home () {
         }
     };
 
-	useEffect(() => {
-        if (isProcessing) {
-            lotCountRef.current = 0;
-            collectionCountRef.current = 0;
-            requestAnimationFrame(processLots);
-        }
-    }, [isProcessing]);
-
 
 
 	const process = async () => {
 		setIsProcessing(true);
+		lotCountRef.current = 0;
+		collectionCountRef.current = 0;
+		requestAnimationFrame(processLots);
 	}
 	
 	useEffect(() => {
