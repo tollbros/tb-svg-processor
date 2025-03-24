@@ -4,30 +4,32 @@ function createPath2DFromElement(element) {
 }
 
 function point_in_polygon(point, polygon) {
-  const num_vertices = polygon.length;
+  const num_vertices = polygon?.length;
   const x = point.x;
   const y = point.y;
   let inside = false;
 
-  let p1 = polygon[0];
-  let p2;
+  if (num_vertices) {
+    let p1 = polygon[0];
+    let p2;
 
-  for (let i = 1; i <= num_vertices; i++) {
-    p2 = polygon[i % num_vertices];
+    for (let i = 1; i <= num_vertices; i++) {
+      p2 = polygon[i % num_vertices];
 
-    if (y > Math.min(p1.y, p2.y)) {
-      if (y <= Math.max(p1.y, p2.y)) {
-        if (x <= Math.max(p1.x, p2.x)) {
-          const x_intersection = ((y - p1.y) * (p2.x - p1.x)) / (p2.y - p1.y) + p1.x;
+      if (y > Math.min(p1.y, p2.y)) {
+        if (y <= Math.max(p1.y, p2.y)) {
+          if (x <= Math.max(p1.x, p2.x)) {
+            const x_intersection = ((y - p1.y) * (p2.x - p1.x)) / (p2.y - p1.y) + p1.x;
 
-          if (p1.x === p2.x || x <= x_intersection) {
-            inside = !inside;
+            if (p1.x === p2.x || x <= x_intersection) {
+              inside = !inside;
+            }
           }
         }
       }
-    }
 
-    p1 = p2;
+      p1 = p2;
+    }
   }
 
   return inside;
@@ -70,12 +72,11 @@ function checkCollision(lot, numberElement, coordinates, showDots = false) {
   let checked = false;
 
   if (lot.tagName == 'path') {
-    console.log('Checking path');
     const path1 = createPath2DFromElement(lot);
     const ctx = document.createElement('canvas').getContext('2d');
     checked = ctx.isPointInPath(path1, transformedCenter.x, transformedCenter.y);
   } else {
-    checked = point_in_polygon({ x: transformedCenter.x, y: transformedCenter.y }, coordinates);
+    checked = point_in_polygon({ x: transformedCenter.x ? transformedCenter.x : centerX, y: transformedCenter.y ? transformedCenter.y : centerY }, coordinates);
   }
 
   return checked;

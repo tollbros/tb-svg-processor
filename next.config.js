@@ -9,7 +9,7 @@ if (isGithubActions) {
 
 const nextConfig = {
   basePath: basePath,
-  reactStrictMode: true,
+  reactStrictMode: false,
   images: {
     unoptimized: true,
   },
