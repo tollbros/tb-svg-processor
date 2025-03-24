@@ -95,7 +95,7 @@ export default function Home () {
 		const jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
 
         if (lotCount < theLots.length) {
-			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current, parcels.current);
+			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
             if (success) {
 				theLots[lotCount].style.filter = "brightness(0)";
 				if (parcels.current) {
