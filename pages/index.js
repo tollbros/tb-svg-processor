@@ -5,6 +5,7 @@ import Head from 'next/head'
 import { TransformWrapper, TransformComponent, ReactZoomPanPinchRef } from 'react-zoom-pan-pinch';
 
 import svg_lot_processor from '../utils/svg_lot_processor';
+import getParcel from '../utils/getParcel';
 
 import styles from './index.module.scss';
 
@@ -17,6 +18,7 @@ export default function Home () {
 	const theLotCollections = useRef(null);
 	const NumberCollection  = useRef(null);
 	const sqftCollection  = useRef(null);
+	const parcels = useRef(null);
 	const lotDimensions  = useRef(null);
 	const lotCountRef = useRef(0);
     const collectionCountRef = useRef(0);
@@ -55,6 +57,7 @@ export default function Home () {
 			theLotCollections.current = document.getElementById('LOTS').children;
 			NumberCollection.current = document.getElementById('LOT_NUMBERS').children;
 			sqftCollection.current = document.getElementById('SQUARE_FEET');
+			parcels.current = document.getElementById('PARCELS');
 			lotDimensions.current = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
 		  
         };
@@ -95,9 +98,16 @@ export default function Home () {
 			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
             if (success) {
 				theLots[lotCount].style.filter = "brightness(0)";
+				if (parcels.current) {
+					const myParcel = getParcel(theLots[lotCount], parcels.current);
+					if (myParcel) {
+						theLots[lotCount].setAttribute('data-parcel', myParcel.id);
+					}
+				}
 				lotCountRef.current++;
 				requestAnimationFrame(processLots); // Process the next lot
 			}
+			
         } else {
             lotCountRef.current = 0;
             const nextCollection = collectionCount + 1;
