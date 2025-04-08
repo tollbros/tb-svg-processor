@@ -16,7 +16,7 @@ const getYoungestGroup = (element) => {
   return newElement;
 }
 
-const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollection, lotDimensions) {
+const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollection, lotDimensions, isHighrise = false) {
   //console.log("svg_lot_processor...");
   //const NumberCollection = document.getElementById('LOT_NUMBERS').children;
   //const sqftCollection = document.getElementById('SQUARE_FEET');
@@ -39,15 +39,20 @@ const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollectio
     console.log(currentLot);
   }
 
+  
+
   for (let g = 0; g < NumberCollection.length; g++) {
 
+    
     const numberChildren = NumberCollection[g].querySelectorAll(':scope > *:not([data-jde_num])');
     numberChildren.forEach((numberThing) => {
+      
       let numberElement = numberThing;
       numberElement = getYoungestGroup(numberElement);    
-      const lotDigits = numberElement.textContent.trim();
+      const lotDigits = numberElement.textContent.trim().replace(/\D/g, '');
       const collided = checkCollision(currentLot, numberElement, coordinates);
 
+      
       if (collided) {
         currentLot.setAttribute('data-jde_num', collectionJDE);
         currentLot.setAttribute('data-lot_num', parseInt(lotDigits));
