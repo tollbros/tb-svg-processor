@@ -14,10 +14,13 @@ export default function Home () {
 	const [isProcessing, setIsProcessing] = useState(false); 
 	const [svgFile, setSvgFile] = useState('');
 	const [isDesert, setIsDesert] = useState(false);
+	const [isHighrise, setIsHighrise] = useState(false);
 
+	const highriseID = useRef(null);
 	const theLotCollections = useRef(null);
 	const NumberCollection  = useRef(null);
 	const sqftCollection  = useRef(null);
+	const floorCollection  = useRef(null);
 	const parcels = useRef(null);
 	const lotDimensions  = useRef(null);
 	const lotCountRef = useRef(0);
@@ -54,11 +57,24 @@ export default function Home () {
           	svgWrapper.appendChild(newElement.children[0]);
 
 			console.log("LOADED");
-			theLotCollections.current = document.getElementById('LOTS').children;
-			NumberCollection.current = document.getElementById('LOT_NUMBERS').children;
-			sqftCollection.current = document.getElementById('SQUARE_FEET');
-			parcels.current = document.getElementById('PARCELS');
-			lotDimensions.current = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
+
+			//document.get by partial id of "highrise-" and then some numbers
+			const highrise = document.querySelectorAll('[id^="HIGHRISE-"]');
+
+			if (document.getElementById('LOTS')) {
+				console.log("Found LOTS");
+				theLotCollections.current = document.getElementById('LOTS').children;
+				NumberCollection.current = document.getElementById('LOT_NUMBERS').children;
+				sqftCollection.current = document.getElementById('SQUARE_FEET');
+				parcels.current = document.getElementById('PARCELS');
+				lotDimensions.current = document.getElementById('LOT_DIMS') || document.getElementById('LOT_DIMENSIONS');
+			} else if (highrise) {
+				console.log("Found HIGHRISE");
+				setIsHighrise(true);
+				highriseID.current = highrise[0].id.replace(/HIGHRISE-/, '');
+				floorCollection.current = highrise[0].children;
+			}
+			console.log('haha');
 		  
         };
 
@@ -89,14 +105,31 @@ export default function Home () {
 
 	const processLots = () => {
 
-        const lotCount = lotCountRef.current;
-        const collectionCount = collectionCountRef.current;
-        const theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
-		const jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
+		let theLots, jde_num, numCollection;
 
-        if (lotCount < theLots.length) {
-			const success = svg_lot_processor(theLots[lotCount], jde_num, NumberCollection.current, sqftCollection.current, lotDimensions.current);
-            if (success) {
+		const lotCount = lotCountRef.current;
+		const collectionCount = collectionCountRef.current;
+
+
+		if (isHighrise) {
+			console.log('highrise parsing');
+			const theFloor = document.getElementById(floorCollection.current[collectionCount].id).children;
+			const theUnitsElement = Array.from(theFloor).find(el => el.getAttribute('data-name') === "UNITS" || el.id === "UNITS");
+			theLots = theUnitsElement?.children;
+			const theNumbersElement = Array.from(theFloor).find(el => el.getAttribute('data-name') === "LABELS"|| el.id === "LABELS");
+			numCollection = theNumbersElement?.children;
+			jde_num = highriseID.current;
+		} else {
+			theLots = document.getElementById(theLotCollections.current[collectionCount].id).children;
+			jde_num = theLotCollections.current[collectionCount].id.replace(/LOTS-/, '');
+			numCollection = NumberCollection.current;
+		}
+
+
+
+		if (lotCount < theLots?.length) {
+			const success = svg_lot_processor(theLots[lotCount], jde_num, numCollection, sqftCollection.current, lotDimensions.current, isHighrise);
+			if (success) {
 				theLots[lotCount].style.filter = "brightness(0)";
 				if (parcels.current) {
 					const myParcel = getParcel(theLots[lotCount], parcels.current);
@@ -108,20 +141,22 @@ export default function Home () {
 				requestAnimationFrame(processLots); // Process the next lot
 			}
 			
-        } else {
-            lotCountRef.current = 0;
-            const nextCollection = collectionCount + 1;
-            if (nextCollection < theLotCollections.current.length) {
-                collectionCountRef.current = nextCollection;
-                requestAnimationFrame(processLots); // Move to the next collection
-            } else {
+		} else {
+			lotCountRef.current = 0;
+			const nextCollection = collectionCount + 1;
+			const collectionLength = isHighrise ? floorCollection.current.length : theLotCollections.current.length;
+			if (nextCollection < collectionLength) {
+				collectionCountRef.current = nextCollection;
+				requestAnimationFrame(processLots); // Move to the next collection
+			} else {
 				document.querySelectorAll('[style*="brightness(0)"]').forEach((el) => {
 					el.style.filter = "";
 				});
-                setIsSvgSuccessfullyProcessed(true);
-                setIsProcessing(false);
-            }
-        }
+				setIsSvgSuccessfullyProcessed(true);
+				setIsProcessing(false);
+			}
+		}
+
     };
 
 
@@ -131,6 +166,10 @@ export default function Home () {
 		if (isDesert) {
 			const theSVG = document.querySelector('svg');
 			theSVG.setAttribute('data-terrain', "desert");
+		}
+		if (isHighrise) {
+			const theSVG = document.querySelector('svg');
+			theSVG.setAttribute('data-highrise', "true");
 		}
 		lotCountRef.current = 0;
 		collectionCountRef.current = 0;
