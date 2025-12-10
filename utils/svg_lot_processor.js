@@ -45,14 +45,14 @@ const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollectio
     numberChildren.forEach((numberThing) => {
       let numberElement = numberThing;
       numberElement = getYoungestGroup(numberElement);    
-      const lotDigits = numberElement.textContent.trim();
+      const lotDigits = parseInt(numberThing.textContent.trim().replace(/\s+/g, ''), 10);
       const collided = checkCollision(currentLot, numberElement, coordinates);
 
       if (collided) {
         currentLot.setAttribute('data-jde_num', collectionJDE);
-        currentLot.setAttribute('data-lot_num', parseInt(lotDigits));
+        currentLot.setAttribute('data-lot_num', lotDigits);
         numberThing.setAttribute('data-jde_num', collectionJDE);
-        numberThing.setAttribute('data-lot_num', parseInt(lotDigits));
+        numberThing.setAttribute('data-lot_num', lotDigits);
 
 
         if (sqftCollection) {
@@ -72,7 +72,7 @@ const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollectio
       
                   if (sqft_collided) {
                     parentSQFT.setAttribute('data-jde_num', collectionJDE);
-                    parentSQFT.setAttribute('data-lot_num', parseInt(lotDigits));
+                    parentSQFT.setAttribute('data-lot_num', lotDigits);
                   }
               });
           });
@@ -93,14 +93,12 @@ const svg_lot_processor = function(lot, jde_num, NumberCollection, sqftCollectio
               } */
 
               const currentDIM = getYoungestGroup(parentLotDim);
-      
-              console.log(currentDIM);
               const dim_collided = checkCollision(currentLot, currentDIM, coordinates);
       
               if (dim_collided) {
                 console.log('DIM COLLIDED');
                 parentLotDim.setAttribute('data-jde_num', collectionJDE);
-                parentLotDim.setAttribute('data-lot_num', parseInt(lotDigits));
+                parentLotDim.setAttribute('data-lot_num', lotDigits);
               }
           });
       }
